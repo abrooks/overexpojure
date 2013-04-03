@@ -1,7 +1,8 @@
 (ns overexpojure.core
   (require [pl.danieljanus.tagsoup :as ts]))
 
-(def e (ts/parse "file:///home/moquist/projects/overexpojure/ClojureConj2012.html"))
+(def e (ts/parse "file:ClojureConj2012.html"))
+(def f (ts/parse "file:ClojureWest2012.html"))
 
 (defn find-first [[tag attr & content] name]
   (some #(when (= name (first %))
