@@ -14,6 +14,28 @@
   ([html fpath & rpath]
      (apply html-> (find-first html fpath) rpath)))
 
+{:conferences {:conj-2010
+               {:name "Clojure/conj 2010"
+                :location "Raleigh, NC"
+                :attendees 150
+                :rooms {:main "Main room"}
+                :tags #{:clojure-conj}}
+               :west-2012
+               {:name "Clojure/West 2012"
+                :location "San Jose, CA"}}
+ :speakers {:fogus {:name "Michael Fogus"
+                    :bio "He's just this guy, you know..."
+                    :links #{:twitter "http://twitter.com/fogus"
+                             :github "https://github.com/fogus"}}}
+ :talks [{:conference :conj-2010
+          :when #inst "2010-10-22T09:40"
+          :room :main
+          :duration 18
+          :speakers #{:fogus}
+          :title "Fertile Ground: The Roots of Clojure"
+          :links {:video "http://www.youtube.com/watch?v=NnSpaR67hXg"}
+          :tags #{:history}}]}
+
 (comment
   ;; Starts with :html
   ;; How-to-run comments here
