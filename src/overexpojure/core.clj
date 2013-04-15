@@ -22,8 +22,10 @@
 (defn get-attrs [e]
   (:attr (meta e)))
 
-(defn get-attr [e k]
-  (get (get-attrs e) k))
+(defn get-attr
+  ([e k] (get-attr e k nil))
+  ([e k d]
+     (get (get-attrs e) k d)))
 
 (defn html->
   ([html] html)
