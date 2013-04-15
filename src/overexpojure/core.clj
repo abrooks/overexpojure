@@ -1,6 +1,8 @@
 (ns overexpojure.core
   (require [pl.danieljanus.tagsoup :as ts]
-           [clojure.walk :refer [prewalk]]))
+           [clojure.walk :refer [prewalk]]
+           [clj-time.core :as time]
+           [clj-time.format :as tf]))
 
 (def e (ts/parse "file:ClojureConj2012.html"))
 (def f (ts/parse "file:ClojureWest2012.html"))
@@ -44,6 +46,27 @@
           (recur (into out (repeat span f)) (drop (dec span) r))
           (recur (conj out f) r))))))
 
+;; Convert the below to clj-time format?
+(def date-pattern #"^\d\d?:\d\d [AP]M$")
+
+;;; cf. http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html
+(def day-parser (tf/formatter (time/default-time-zone) "EEE" "EEEE"))
+(def date-parser (tf/formatter (time/default-time-zone) "MMM-dd" "MMMM-dd"))
+
+(defmacro catch-false [& body]
+  "Oh, the terrible things Java makes us do..."
+  `(try
+    ~@body
+    (catch Throwable t#
+      false)))
+
+(defn categorize [tr]
+  (let [item (first (flatten tr))]
+    (cond
+     (re-find date-pattern item) :time
+     (catch-false (tf/parse day-parser item)) :day
+     (catch-false (tf/parse date-parser item)) :date
+     :else :room)))
 
 (comment
   ;; Starts with :html
@@ -54,6 +77,9 @@
   (binding [*print-meta* false]
     (doseq [tr (html-> (un-html f) :body :table :tbody)]
       (prn (ex-span-d tr))))
+
+  (group-by categorize (for [tr (rest (html-> (un-html f) :body :table :tbody))]
+                         (ex-span-d (rest tr))))
 
   {:conferences {:conj-2010
                  {:name "Clojure/conj 2010"
