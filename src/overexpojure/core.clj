@@ -35,14 +35,14 @@
             rpath)))
 
 (defn ex-span-d [tr]
-
-#_(binding [*print-meta* true]
-    (doseq [tr (html-> (un-html f) :body :table :tbody)
-            td tr
-            :when (= "3" (get-attr td :colspan))]
-      (prn td)))
-
-  )
+  (loop [out [] in tr]
+    (if (empty? in)
+      out
+      (let [[f & r] in
+            span (Integer. (get-attr f :colspan "1"))]
+        (if (< 1 span)
+          (recur (into out (repeat span f)) (drop (dec span) r))
+          (recur (conj out f) r))))))
 
 
 (comment
@@ -50,6 +50,10 @@
   ;; How-to-run comments here
   (html-> e :body :table :tbody)
   (html-> e :body :table :tbody :tr :td)
+
+  (binding [*print-meta* false]
+    (doseq [tr (html-> (un-html f) :body :table :tbody)]
+      (prn (ex-span-d tr))))
 
   {:conferences {:conj-2010
                  {:name "Clojure/conj 2010"
