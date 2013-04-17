@@ -47,7 +47,7 @@
           (recur (conj out f) r))))))
 
 ;; Convert the below to clj-time format?
-(def date-pattern #"^\d\d?:\d\d [AP]M$")
+(def time-pattern #"^\d\d?:\d\d [AP]M$")
 
 ;;; cf. http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html
 (def day-parser (tf/formatter (time/default-time-zone) "EEE" "EEEE"))
@@ -63,7 +63,7 @@
 (defn categorize [tr]
   (let [item (first (flatten tr))]
     (cond
-     (re-find date-pattern item) :time
+     (re-find time-pattern item) :time
      (catch-false (tf/parse day-parser item)) :day
      (catch-false (tf/parse date-parser item)) :date
      :else :room)))
