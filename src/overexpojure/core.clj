@@ -61,13 +61,51 @@
     (catch Throwable t
       false)))
 
-(defn categorize [tr]
+(defn tr-categorize
+  "Categorize the tr as :time, :day, or :date"
+  [tr]
   (let [item (first (flatten tr))]
     (cond
      (re-find time-pattern item) :time
      (catch-false #(tf/parse day-parser item)) :day
      (catch-false #(tf/parse date-parser item)) :date
      :else :room)))
+
+(defn categorize
+  [html]
+  (let [uh (html-> (un-html html) :body :table :tbody)]
+    (group-by tr-categorize (for [tr (rest uh)]
+                              (ex-span-d (rest tr))))))
+
+(defn talk-ify [{:keys [conf year date tslot room talk] :as kvs}]
+  (let [spkrs-title (ffirst talk)
+        [_ spkrs-str title] (re-matches #"([^/]*) / (.*)" spkrs-title)
+        spkrs (map (memfn trim) (re-seq #"[^,&]+" spkrs-str))]
+    ;; Use kvs to pull keys for base map and then add additionals.
+    {:conf conf
+     :year year
+     :date date
+     :tslot tslot
+     :room room
+     :speakers spkrs
+     :title title
+     :links {:video (get-attr (first talk) :href "")}
+     }))
+
+(defn data-ify
+  "Convert HTML into our special data format"
+  [html year conf]
+  (let [{:keys [date room time]} (categorize html)
+        date (nfirst date)
+        room (nfirst room)]
+    (doseq [t time
+            [date room talk] (map vector date room (rest t))
+            :let [tslot (ffirst t)]
+            :when (ffirst talk)]
+      (binding [*print-meta* false]
+        (prn (talk-ify {:conf conf, :year year
+                        :date date, :tslot tslot
+                        :room room, :talk talk}))))))
 
 (comment
   ;; Starts with :html
@@ -81,6 +119,8 @@
 
   (group-by categorize (for [tr (rest (html-> (un-html f) :body :table :tbody))]
                          (ex-span-d (rest tr))))
+
+  (data-ify f "2012" "Clojure/West")
 
   {:conferences {:conj-2010
                  {:name "Clojure/conj 2010"
@@ -103,4 +143,16 @@
             :title "Fertile Ground: The Roots of Clojure"
             :links {:video "http://www.youtube.com/watch?v=NnSpaR67hXg"}
             :tags #{:history}}]}
+
+  {:day [[[] ["Friday"] ["Friday"] ["Friday"] [] ["Saturday"] ["Saturday"] ["Saturday"]]],
+   :date [[[] ["Mar-16"] ["Mar-16"] ["Mar-16"] [] ["Mar-17"] ["Mar-17"] ["Mar-17"]]],
+   :room [[[] ["Salon 1-4"] ["Salon 5-6"] ["Willow Glen"] [] ["Salon 1-4"] ["Salon 5-6"] ["Willow Glen"]]],
+   :time [[["9:00 AM"] [["Rich Hickey / The Design of Datomic"]] [] [] [] [["Bradford Cross / Why Prismatic Goes Faster with Clojure"]] [] []]
+          [["10:00 AM"] [["David McNeil / Macros are Hard!"]] [["Craig Andera / Namespaces, Vars, and Symbols (Oh My!)"]] [["Reid Draper / Knockbox, an Eventual Consistency Toolkit"]] [] [["Nathan Marz / Storm: Distributed and Fault-tolerant Real-time Computation"]] [["Zach Tellman / Distilling Java Libraries"]] [["Allen Rohner / The Good, The Bad & The Ugly (Clojure and JRuby)"]]]
+          [["11:00 AM"] [["Alan Dipert / Programming with Values in Clojure"]] [["Amit Rathore / clojure @ runa :: dynamic pricing through DSLs"]] ["Colin Jones / Clojure Koans Hackfest"] [] [["Chris Houser / Distributed Apps: The Joys of Testing and Debugging"]] [["Colin Jones / SOLID Clojure"]] ["Federico Brubacher / Real world Cascalog: Past, Present, Future"]]
+          [["1:00 PM"] [["Chas Emerick /  What Sucks about Clojure... and Why You'll Love It Anyway"]] [["Baishampayan Ghose / The Taming of the Deftype"]] [["Jim Crossley / Introducing Immutant"]] [] [] [] []]
+          [["2:00 PM"] ["Andy Kringer / Load testing with Clojure"] [["Antoni Batchelli / Pallet - DevOps for the JVM"]] [["Dave Ray / Building User Interfaces with Seasaw"]] [] [["Sean Corfield / Real World Clojure - Doing Boring Stuff with an Exciting Language"]] [["Kevin Lynagh / Statistical Graphics, ClojureScript, &c."]] [["Phil Hagelberg / Swarm Coding"]]]
+          [["2:30 PM"] [["Aaron Bedra / The Generative Generation"]] [["Alan Witaker / Building tools to help kids Win with ADHD"]] [["Micah Martin / Clojure in the Clouds"]] [] [["Daniel Solano Gómez / Crunching Numbers with Clojure - 11 Tips to Boost Your Performance"]] [["Luke VanderHart / Beyond Ninjas: DOM manipulation with ClojureScript and Domina"]] []]
+          [["3:00 PM"] [["Bill Caputo / Continuous Testing in Clojure"]] [["Paul deGrandis / Clojure-powered Startups"]] [["Pat Patterson / Accessing Real-World APIs from Clojure"]] [] [["Jim Duey / DSLs in Clojure"]] [["Creighton Kirkendall / Building ClojureScript Libraries: Google Closure and Challenges of a Young Language"]] []] [["4:00 PM"] [["Stuart Sierra / Thinking in Data"]] [["Tyler Jennings / Bootstrapping Clojure at Groupon"]] [["Carin Meier / Why is a Monad Like a Writing Desk"]] [] [["Michael Fogus / ClojureScript Anatomy"]] [["Ryan Senior / Practical core.logic"]] [["Paul Stadig / Laziness: the Good, the Bad and the Ugly"]]] [["5:00 PM"] [["Richard Gabriel / Engineering(,) A Path to Science: 'I don't want to die in a language I can't understand'"]] [] [] [] [["Stuart Halloway / Evident Code, at Scale"]] [] []] [["7:00 PM"] [] ["Unsession: Hacking with Clojure on Android"] [] [] [] [] []] [["7:30 PM"] ["Unsession: Clojure User Groups - creating and running them"] ["Unsession: Infrastructure automation with Pallet"] ["Unsession: Pino and ClojureScript apps"] [] [] [] []] [["8:00 PM"] ["Unsession: Clojurepunk for the Masses"] ["Unsession: Hacking with Datomic"] [] [] [] [] []] [["9:00 PM"] ["Unjam: Release your inner Clojurepunk"] ["Unsession: ClojureScript and Testing"] [] [] [] [] []]]}
+
   )
