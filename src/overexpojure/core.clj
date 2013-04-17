@@ -53,19 +53,20 @@
 (def day-parser (tf/formatter (time/default-time-zone) "EEE" "EEEE"))
 (def date-parser (tf/formatter (time/default-time-zone) "MMM-dd" "MMMM-dd"))
 
-(defmacro catch-false [& body]
+(defn catch-false
   "Oh, the terrible things Java makes us do..."
-  `(try
-    ~@body
-    (catch Throwable t#
+  [f]
+  (try
+    (f)
+    (catch Throwable t
       false)))
 
 (defn categorize [tr]
   (let [item (first (flatten tr))]
     (cond
      (re-find time-pattern item) :time
-     (catch-false (tf/parse day-parser item)) :day
-     (catch-false (tf/parse date-parser item)) :date
+     (catch-false #(tf/parse day-parser item)) :day
+     (catch-false #(tf/parse date-parser item)) :date
      :else :room)))
 
 (comment
