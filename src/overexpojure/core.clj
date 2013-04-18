@@ -100,7 +100,10 @@
         room (-> room first next first)]
     (doseq [t time
             [date room talk] (map vector date room (rest t))
-            :let [tslot (ffirst t)]
+            :let [tslot (ffirst t)
+                  talk (if (-> talk first string?)
+                         [talk]
+                         talk)]
             :when (ffirst talk)]
       (binding [*print-meta* false]
         (prn (talk-ify {:conf conf, :year year
