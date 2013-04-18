@@ -52,6 +52,11 @@
 ;;; cf. http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html
 (def day-parser (tf/formatter (time/default-time-zone) "EEE" "EEEE"))
 (def date-parser (tf/formatter (time/default-time-zone) "MMM-dd" "MMMM-dd"))
+(def when-parser (tf/formatter (time/default-time-zone)
+                               "YYYY-MMM-dd h:mm aa zzz"
+                               "YYYY-MMM-dd hh:mm aa zzz"
+                               "YYYY-MMMM-dd h:mm aa zzz"
+                               "YYYY-MMMM-dd hh:mm aa zzz"))
 
 (defn catch-false
   "Oh, the terrible things Java makes us do..."
@@ -77,20 +82,21 @@
     (group-by tr-categorize (for [tr (rest uh)]
                               (ex-span-d (rest tr))))))
 
-(defn talk-ify [{:keys [conf year date tslot room talk] :as kvs}]
+(defn talk-ify [{:keys [conf year date tslot room talk]}]
   (let [spkrs-title (ffirst talk)
         [_ spkrs-str title] (re-matches #"([^/]*) / (.*)" spkrs-title)
-        spkrs (map (memfn trim) (re-seq #"[^,&]+" spkrs-str))]
-    ;; Use kvs to pull keys for base map and then add additionals.
-    {:conf conf
-     :year year
-     :date date
-     :tslot tslot
+        spkrs-str (or spkrs-str "")
+        title (or title spkrs-title)
+        spkrs (map (memfn trim) (re-seq #"[^,&]+" spkrs-str))
+        when (->> (str year "-" date " " tslot " UT")
+                  (tf/parse when-parser)
+                  .toDate)]
+    {:conference conf
+     :when when
      :room room
      :speakers spkrs
      :title title
-     :links {:video (get-attr (first talk) :href "")}
-     }))
+     :links {:video (get-attr (first talk) :href "")}}))
 
 (defn data-ify
   "Convert HTML into our special data format"
