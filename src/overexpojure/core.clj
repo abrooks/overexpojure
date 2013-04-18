@@ -96,8 +96,8 @@
   "Convert HTML into our special data format"
   [html year conf]
   (let [{:keys [date room time]} (categorize html)
-        date (nfirst date)
-        room (nfirst room)]
+        date (-> date first next first)
+        room (-> room first next first)]
     (doseq [t time
             [date room talk] (map vector date room (rest t))
             :let [tslot (ffirst t)]
