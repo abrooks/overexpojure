@@ -71,7 +71,8 @@
 (defn tr-categorize
   "Categorize the tr as :time, :day, or :date"
   [tr]
-  (let [item (first (flatten tr))]
+  (let [item (first (flatten tr))
+        item (or item "")]
     (cond
      (re-find time-pattern item) :time
      (catch-false #(tf/parse day-parser item)) :day
