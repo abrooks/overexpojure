@@ -107,17 +107,16 @@
   (let [{:keys [date room time]} (categorize html)
         date (-> date first next first)
         room (-> room first next first)]
-    (doseq [t time
-            [date room talk] (map vector date room (rest t))
-            :let [tslot (ffirst t)
-                  talk (if (-> talk first string?)
-                         [talk]
-                         talk)]
-            :when (ffirst talk)]
-      (binding [*print-meta* false]
-        (prn (talk-ify {:conf conf, :year year
-                        :date date, :tslot tslot
-                        :room room, :talk talk}))))))
+    (for [t time
+          [date room talk] (map vector date room (rest t))
+          :let [tslot (ffirst t)
+                talk (if (-> talk first string?)
+                       [talk]
+                       talk)]
+          :when (ffirst talk)]
+      (talk-ify {:conf conf, :year year
+                 :date date, :tslot tslot
+                 :room room, :talk talk}))))
 
 (comment
   ;; Starts with :html
