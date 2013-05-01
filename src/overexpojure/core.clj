@@ -106,7 +106,8 @@
   [html year conf]
   (let [{:keys [date room time]} (categorize html)
         date (-> date first next first)
-        room (-> room first next first)]
+        room (-> room first next first)
+        room (or room [""])]
     (for [t time
           [date room talk] (map vector date room (rest t))
           :let [tslot (ffirst t)
