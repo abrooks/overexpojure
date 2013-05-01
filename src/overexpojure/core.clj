@@ -4,8 +4,10 @@
            [clj-time.core :as time]
            [clj-time.format :as tf]))
 
-(def e (ts/parse "file:ClojureConj2012.html"))
-(def f (ts/parse "file:ClojureWest2012.html"))
+(def c2010 (ts/parse "file:ClojureConj2010.html"))
+(def c2011 (ts/parse "file:ClojureConj2011.html"))
+(def c2012 (ts/parse "file:ClojureConj2012.html"))
+(def w2012 (ts/parse "file:ClojureWest2012.html"))
 
 (defn meta-ize [[tag attr & cont]]
   (with-meta
