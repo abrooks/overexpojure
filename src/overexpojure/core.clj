@@ -77,7 +77,8 @@
      (re-find time-pattern item) :time
      (catch-false #(tf/parse day-parser item)) :day
      (catch-false #(tf/parse date-parser item)) :date
-     :else :room)))
+     (not (empty? item)) :room
+     :else :skip)))
 
 (defn categorize
   [html]
