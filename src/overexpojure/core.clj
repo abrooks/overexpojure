@@ -133,7 +133,7 @@
   (group-by categorize (for [tr (rest (html-> (un-html f) :body :table :tbody))]
                          (ex-span-d (rest tr))))
 
-  (data-ify f "2012" "Clojure/West")
+  (data-ify w2012 "2012" "Clojure/West")
 
   {:conferences {:conj-2010
                  {:name "Clojure/conj 2010"
