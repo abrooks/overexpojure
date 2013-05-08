@@ -8,6 +8,12 @@
 (def c2011 (ts/parse "file:ClojureConj2011.html"))
 (def c2012 (ts/parse "file:ClojureConj2012.html"))
 (def w2012 (ts/parse "file:ClojureWest2012.html"))
+(def allconfs
+  [[c2010 "2010" "Clojure/conj"]
+   [c2011 "2011" "Clojure/conj"]
+   [c2012 "2012" "Clojure/conj"]
+   [w2012 "2012" "Clojure/west"]])
+(def talksdata (flatten (map #(apply data-ify %) allconfs)))
 
 (defn meta-ize [[tag attr & cont]]
   (with-meta
