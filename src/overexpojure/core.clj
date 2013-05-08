@@ -126,6 +126,19 @@
                  :date date, :tslot tslot
                  :room room, :talk talk}))))
 
+(defn collect-val [dataset key talk]
+  (prn dataset key talk)
+  (if (empty? (talk key))
+    dataset
+    (conj dataset (talk key))))
+
+(defn coalesce-confs [talksdata]
+  (reduce #({:conferences (collect-val (% :conferences) :conference %2)
+             :speakers (collect-val (% :speakers) :speakers %2)
+             :talks (conj (% :talks) %2)})
+          {:conferences #{} :speakers #{} :talks []}
+          talksdata))
+
 (comment
   ;; Starts with :html
   ;; How-to-run comments here
