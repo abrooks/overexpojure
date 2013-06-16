@@ -91,6 +91,19 @@
     (group-by tr-categorize (for [tr (rest uh)]
                               (ex-span-d (rest tr))))))
 
+(defn un-googlify
+  "This atrocity is brought to you by the letter G... Followed by oogle."
+  [googlewad]
+  (if (.startsWith googlewad "http://www.google.com/url")
+    (->> googlewad
+         java.net.URI.
+         .getQuery
+         (re-seq #"[^&]+")
+         (filter #(.startsWith % "q="))
+         first
+         (#(.replaceFirst % "q=" "")))
+    googlewad))
+
 (defn talk-ify [{:keys [conf year date tslot room talk]}]
   (let [spkrs-title (ffirst talk)
         [_ spkrs-str title] (re-matches #"([^/]*) / (.*)" spkrs-title)
@@ -106,7 +119,7 @@
      :room room
      :speakers spkrs
      :title title
-     :links {:video (get-attr (first talk) :href "")}}))
+     :links {:video (un-googlify (get-attr (first talk) :href ""))}}))
 
 (defn data-ify
   "Convert HTML into our special data format"
