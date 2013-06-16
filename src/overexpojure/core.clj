@@ -101,6 +101,7 @@
                   (tf/parse when-parser)
                   .toDate)]
     {:conference conf
+     :year year
      :when when
      :room room
      :speakers spkrs
