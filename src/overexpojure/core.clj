@@ -13,7 +13,6 @@
    [c2011 "2011" "Clojure/conj"]
    [c2012 "2012" "Clojure/conj"]
    [w2012 "2012" "Clojure/west"]])
-(def talksdata (flatten (map #(apply data-ify %) allconfs)))
 
 (defn meta-ize [[tag attr & cont]]
   (with-meta
@@ -153,6 +152,9 @@
                          (ex-span-d (rest tr))))
 
   (data-ify w2012 "2012" "Clojure/West")
+
+  ;; all talks:
+  (flatten (map #(apply data-ify %) allconfs))
 
   {:conferences {:conj-2010
                  {:name "Clojure/conj 2010"
