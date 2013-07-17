@@ -1,6 +1,7 @@
 (ns overexpojure.datomic
   (require [datomic.api :as d :refer [db q]]))
 
+;; TODO: how to handle DB connection?
 (def uri "datomic:mem://test")
 
 (def schema
@@ -20,6 +21,8 @@
           (for [vattr attrs
                 :let [[attr type & cardinality] vattr
                       cardinality (if (= :many (first cardinality)) :db.cardinality/many :db.cardinality/one)]]
+            ;; TODO: #db/id is broken here. Every attribute gets the same ID.
+            ;; Surely I'm doing this wrong.
             {:db/id #db/id [:db.part/db]
              :db/ident (keyword (str (name namespace) "/" (name attr)))
              :db/valueType (keyword (str "db.type/" (name type)))
