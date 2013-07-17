@@ -28,7 +28,21 @@
    (flatten)
    (vec)))
 
+
+
+
 (comment
+
+  @(d/transact (d/connect oed/uri) oed/schema)
+  @(d/transact (d/connect oed/uri) [{:db/id #db/id[:db.part/user -1]
+                                     :conference/name "hamish"
+                                     :conference/location "canada"
+                                     :conference/year 1996
+                                     :conference/tags ["gordon korman"]}])
+  (def e (-> (d/connect oed/uri) db (d/entity (ffirst (q '[:find ?e :where [?e :conference/location]] (db (d/connect oed/uri)))))))
+
+
+  
   [{:db/id #db/id [:db.part/db]
     :db/ident :person/name
     :db/valueType :db.type/string
@@ -47,5 +61,18 @@
   (defn reconn []
     (d/connect uri))
   
+
+
+  @(d/transact tconn [{:db/id #db/id [:db.part/db] :db/ident :person/name :db/valueType :db.type/string :db/cardinality :db.cardinality/one :db.install/_attribute :db.part/db}])
+
+  @(d/transact tconn [{:db/id #db/id[:db.part/user -1] :person/name "hamish"}])
+  
+  (def results (q '[:find ?e :where [?e :person/name]] (db tconn)))
+
+  (def id (ffirst results))
+  (def entity (-> conn db (d/entity id)))
+
+  ;; display the entity map's keys
+  (keys entity)
   
   )
