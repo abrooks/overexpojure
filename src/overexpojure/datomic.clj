@@ -1,6 +1,8 @@
 (ns overexpojure.datomic
   (require [datomic.api :as d :refer [db q]]))
 
+(def uri "datomic:mem://test")
+
 (def schema
   (->>
    {:conference [[:name :string] ; ex: "Clojure/conj 2010"
@@ -36,7 +38,6 @@
 
 
   ;; http://docs.datomic.com/clojure-api.html
-  (def uri "datomic:mem://test")
   (defn reset-db []
     (if-let [conn (d/connect uri)]
       (d/delete-database uri))
