@@ -2,7 +2,8 @@
   (require [pl.danieljanus.tagsoup :as ts]
            [clojure.walk :refer [prewalk]]
            [clj-time.core :as time]
-           [clj-time.format :as tf]))
+           [clj-time.format :as tf]
+           (datomic)))
 
 (def c2010 (ts/parse "file:ClojureConj2010.html"))
 (def c2011 (ts/parse "file:ClojureConj2011.html"))
