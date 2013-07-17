@@ -35,14 +35,21 @@
 
 
 (comment
-
+  ;; to test:
+  (reset)
   @(d/transact (d/connect oed/uri) oed/schema)
   @(d/transact (d/connect oed/uri) [{:db/id #db/id[:db.part/user -1]
                                      :conference/name "hamish"
                                      :conference/location "canada"
                                      :conference/year 1996
                                      :conference/tags ["gordon korman"]}])
-  (def e (-> (d/connect oed/uri) db (d/entity (ffirst (q '[:find ?e :where [?e :conference/location]] (db (d/connect oed/uri)))))))
+  (def e (-> (d/connect oed/uri)
+             db
+             (d/entity
+              (ffirst
+               (q '[:find ?e
+                    :where [?e :conference/location]]
+                  (db (d/connect oed/uri)))))))
 
 
   
